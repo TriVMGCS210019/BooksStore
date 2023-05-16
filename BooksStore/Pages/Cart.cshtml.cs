@@ -13,12 +13,12 @@ namespace BooksStore.Pages
             repository = repo;
             Cart = cartService;
         }
-        public Cart? Cart { get; set; }
+        public Cart Cart { get; set; }
         public string ReturnUrl { get; set; } = "/";
         public void OnGet(string returnUrl)
         {
             ReturnUrl = returnUrl ?? "/";
-            Cart = HttpContext.Session.GetJson<Cart>("cart") ?? new Cart();
+           //Cart = HttpContext.Session.GetJson<Cart>("cart") ?? new Cart();
         }
         public IActionResult OnPost(long productId, string returnUrl)
         {
@@ -30,12 +30,11 @@ namespace BooksStore.Pages
             }
             return RedirectToPage(new { returnUrl = returnUrl });
         }
-        public IActionResult OnPostRemove(long productId, string returnUrl)
+       public IActionResult OnPostRemove(long productId, string returnUrl)
         {
-            Cart.RemoveLine(Cart.Lines.First(c1 =>
-                c1.Product.ProductID == productId).Product);
+            Cart.RemoveLine(Cart.Lines.First(cl =>
+            cl.Product.ProductID == productId).Product);
             return RedirectToPage(new { returnUrl = returnUrl });
         }
-
     }
 }
