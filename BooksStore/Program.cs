@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using BooksStore.Models;
 using Microsoft.AspNetCore.Identity;
+using BooksStore.Repository;
+using System.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +14,10 @@ builder.Services.AddDbContext<StoreDbContext>(opts => {
         builder.Configuration["ConnectionStrings:BooksStoreConnection"]);
 });
 
+builder.Services.AddDbContext<LoginDbContext>(options =>
+            options.UseSqlServer(
+                builder.Configuration["ConnectionStrings:IdentityConnection"]));
+builder.Services.AddScoped<ILogin, AuthenticateLogin>();
 builder.Services.AddScoped<IStoreRepository, EFStoreRepository> ();
 builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
 
@@ -25,6 +32,8 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
                 builder.Configuration["ConnectionStrings:IdentityConnection"]));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppIdentityDbContext>();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction()) {
@@ -38,15 +47,6 @@ app.UseRequestLocalization(opts =>
     .SetDefaultCulture("en-US");
 });
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
 
